@@ -1,3 +1,6 @@
+openfire version:
+	3.8.2
+
 refer packegae:
 	mongo-2.10.1.jar
 	smack.jar
