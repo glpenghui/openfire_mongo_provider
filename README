@@ -1,0 +1,7 @@
+refer packegae:
+	mongo-2.10.1.jar
+	smack.jar
+	smackx-debug.jar
+	smackx-jingle.jar
+	smackx.jar
+	openfire.jar
