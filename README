@@ -8,3 +8,9 @@ refer packegae:
 	smackx-jingle.jar
 	smackx.jar
 	openfire.jar
+
+install:
+	1.copy refer packeage to openfire/lib dir; copy mongo_provider.propertie to openfire/config
+	2.modify mongo_provider.properties
+	3.execute sql.sql in openfire mysql database
+	4.restart openfire
