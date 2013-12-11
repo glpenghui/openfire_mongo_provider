@@ -1,7 +1,9 @@
 package com.mmbang.im.provider;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.bson.types.ObjectId;
@@ -12,6 +14,7 @@ import org.jivesoftware.openfire.user.UserProvider;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
@@ -20,6 +23,8 @@ public class MongoUserProvider implements UserProvider {
 	private String COLLECTION_NAME;
 	private String USERNAME_KEY;
 	private String EMAIL_KEY;
+	private String NICKNAME_KEY;
+	private String REGISTER_TIME_KEY;
 	private MongoConfig mc;
 	public MongoUserProvider()
 	{
@@ -28,6 +33,8 @@ public class MongoUserProvider implements UserProvider {
 		this.COLLECTION_NAME=mc.getRb().getString("collection_name");
 		this.USERNAME_KEY=mc.getRb().getString("username_key");
 		this.EMAIL_KEY=mc.getRb().getString("email_key");
+		this.NICKNAME_KEY=mc.getRb().getString("nickname_key");
+		this.REGISTER_TIME_KEY="register_time";
 	}
 	
 	public User createUser(String username, String password, String name,
@@ -83,9 +90,32 @@ public class MongoUserProvider implements UserProvider {
 	}
 
 	public Collection<User> getUsers(int startIndex, int numResults) {
-		System.out.println("getUsers2");
+		System.out.println("getUsers2.3");
 		// TODO Auto-generated method stub
-		return null;
+		Collection<User> usersColl=new ArrayList<User>();
+		
+		Mongo mongo=MongoDBManage.getConnection();
+		DBCollection users=mongo.getDB(DB_NAME).getCollection(COLLECTION_NAME);
+		DBCursor cursor=users.find().skip(startIndex).limit(numResults);
+		Iterator<DBObject> iter=cursor.iterator();
+		while(iter.hasNext()){
+			BasicDBObject userObject=(BasicDBObject) iter.next();
+			String username=userObject.get(USERNAME_KEY).toString();
+	        String name = (String) userObject.get(NICKNAME_KEY);
+	        String email = (String)userObject.get(EMAIL_KEY);
+	        Double creationTime= (Double) userObject.get(REGISTER_TIME_KEY);
+	        
+	        if(creationTime==null){
+	        	creationTime=0.0;
+	        }
+	        
+	        Date creationDate = new Date(creationTime.longValue());
+	        Date modificationDate = new Date();
+	        User userObj=new User(username, name, email, creationDate, modificationDate);
+	        
+	        usersColl.add(userObj);
+		}
+		return usersColl;
 	}
 
 	public boolean isEmailRequired() {
