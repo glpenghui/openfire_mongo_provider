@@ -1,0 +1,18 @@
+<project name="com.mmbang.im" basedir=".">
+	<target name="compile">
+		<delete dir="../target"></delete>
+		<delete file="../com.mmbang.im.jar"></delete>
+		<mkdir dir="../target"/>
+		<javac includeantruntime="on" 
+			optimize="off" encoding="utf-8" 
+			debug="on" 
+			srcdir="../src" destdir="../target">
+			<classpath path="/Volumes/sdisk/workspace/openfire_src/target/openfire/lib/openfire.jar"></classpath>
+			<classpath path="/Volumes/sdisk/open_source/java/mongo-2.10.1.jar"></classpath>
+			<classpath path="/Volumes/sdisk/open_source/java/smack_3_3_1/smack.jar"></classpath>
+			<classpath path="/Volumes/sdisk/open_source/java/smack_3_3_1/smackx-jingle.jar"></classpath>
+			<classpath path="/Volumes/sdisk/open_source/java/smack_3_3_1/smackx.jar"></classpath>
+		</javac>
+		<jar destfile="../com.mmbang.im.jar" basedir="../target"></jar>
+	</target>
+</project>

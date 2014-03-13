@@ -36,7 +36,7 @@ public class MongoVCardProvider implements VCardProvider {
         super();
         
 		mc=new MongoConfig();
-		mongo=MongoDBManage.getConnection();
+		mongo=MongoConnectionManager.getConnection(mc.getRb().getString("host"), new Integer(mc.getRb().getString("port")));
 		
 		this.DB_NAME=mc.getRb().getString("db_name");
 		this.COLLECTION_NAME=mc.getRb().getString("collection_name");
@@ -71,7 +71,6 @@ public class MongoVCardProvider implements VCardProvider {
 	}
 
 	public Element loadVCard(String username) {
-		// TODO Auto-generated method stub
 		Element vCardElement = null;
 		SAXReader xmlReader = null;
 		
@@ -89,6 +88,7 @@ public class MongoVCardProvider implements VCardProvider {
 		
 		DBObject user=null;
 		user=users.findOne(searchQuery);
+		
 		String nickname=(String)user.get(NICKNAME_KEY);
 		String avatarUrl=(String)user.get(AVATAR_KEY);
 		
@@ -97,7 +97,6 @@ public class MongoVCardProvider implements VCardProvider {
 		vcard.setNickName(nickname);
 		vcard.setField("username", username);
 		vcard.setField("avatarURL", avatarUrl!=null ? avatarUrl: mc.getRb().getString("default_avatar_url"));
-		
 		String vcardXml=vcard.toString();
 		try {
 			xmlReader = xmlReaders.take();

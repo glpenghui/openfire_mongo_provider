@@ -6,7 +6,6 @@ import org.jivesoftware.openfire.auth.ConnectionException;
 import org.jivesoftware.openfire.auth.InternalUnauthenticatedException;
 import org.jivesoftware.openfire.auth.UnauthorizedException;
 import org.jivesoftware.openfire.user.UserNotFoundException;
-import com.mmbang.im.provider.MongoDBManage;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
@@ -18,6 +17,7 @@ public class MongoAuthProvider implements AuthProvider {
 	private String USERNAME_KEY;
 	private String PASSWORD_KEY;
 	private MongoConfig mc;
+	private Mongo mongo;
 	
 	public MongoAuthProvider(){
 		mc=new MongoConfig();
@@ -25,6 +25,8 @@ public class MongoAuthProvider implements AuthProvider {
 		this.COLLECTION_NAME=mc.getRb().getString("collection_name");
 		this.USERNAME_KEY=mc.getRb().getString("username_key");
 		this.PASSWORD_KEY=mc.getRb().getString("password_key");
+		System.out.println("MongoAuthProvider host:"+mc.getRb().getString("host"));
+		mongo=MongoConnectionManager.getConnection(mc.getRb().getString("host"), new Integer(mc.getRb().getString("port")));
 	}
 	
 	public void authenticate(String username, String password)
@@ -51,7 +53,6 @@ public class MongoAuthProvider implements AuthProvider {
 	public String getPassword(String username) throws UserNotFoundException,
 			UnsupportedOperationException {
 		// TODO Auto-generated method stub
-		Mongo mongo=MongoDBManage.getConnection();
 		DBCollection users=mongo.getDB(DB_NAME).getCollection(COLLECTION_NAME);
 		BasicDBObject searchQuery = new BasicDBObject();
 		
@@ -66,21 +67,17 @@ public class MongoAuthProvider implements AuthProvider {
 		
 		DBObject user=users.findOne(searchQuery);
 		if (user==null){
-			mongo.close();
 			throw new UserNotFoundException();
 		}
 		String password=(String)user.get(PASSWORD_KEY);
-		//√‹¬Îº”√‹À„∑®
 		String encryptPassword=password;
 		if ("sha1".equals(mc.getRb().getString("password_encrypt"))){
 			encryptPassword=SHA1.getMD5ofStr(password);
 		}
 		
 		if(password==null){
-			mongo.close();
 			throw new UserNotFoundException();
 		}
-		mongo.close();
 		return encryptPassword;
 	}
 

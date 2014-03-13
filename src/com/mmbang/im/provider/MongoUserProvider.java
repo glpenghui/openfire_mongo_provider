@@ -26,9 +26,11 @@ public class MongoUserProvider implements UserProvider {
 	private String NICKNAME_KEY;
 	private String REGISTER_TIME_KEY;
 	private MongoConfig mc;
+	private Mongo mongo;
 	public MongoUserProvider()
 	{
 		mc=new MongoConfig();
+		mongo=MongoConnectionManager.getConnection(mc.getRb().getString("host"), new Integer(mc.getRb().getString("port")));
 		this.DB_NAME=mc.getRb().getString("db_name");
 		this.COLLECTION_NAME=mc.getRb().getString("collection_name");
 		this.USERNAME_KEY=mc.getRb().getString("username_key");
@@ -72,9 +74,9 @@ public class MongoUserProvider implements UserProvider {
 
 	public int getUserCount() {
 		// TODO Auto-generated method stub
-		Mongo mongo=MongoDBManage.getConnection();
 		DBCollection users=mongo.getDB(DB_NAME).getCollection(COLLECTION_NAME);
-		return (int)users.count();
+		int total= (int)users.count();
+		return total;
 	}
 
 	public Collection<String> getUsernames() {
@@ -94,7 +96,6 @@ public class MongoUserProvider implements UserProvider {
 		// TODO Auto-generated method stub
 		Collection<User> usersColl=new ArrayList<User>();
 		
-		Mongo mongo=MongoDBManage.getConnection();
 		DBCollection users=mongo.getDB(DB_NAME).getCollection(COLLECTION_NAME);
 		DBCursor cursor=users.find().skip(startIndex).limit(numResults);
 		Iterator<DBObject> iter=cursor.iterator();
@@ -138,7 +139,6 @@ public class MongoUserProvider implements UserProvider {
 
 	public User loadUser(String username) throws UserNotFoundException {
 		// TODO Auto-generated method stub
-		Mongo mongo=MongoDBManage.getConnection();
 		DBCollection users=mongo.getDB(DB_NAME).getCollection(COLLECTION_NAME);
 		BasicDBObject searchQuery = new BasicDBObject();
 		
@@ -161,7 +161,6 @@ public class MongoUserProvider implements UserProvider {
         String email = (String)user.get(EMAIL_KEY);
         Date creationDate = new Date(Long.parseLong("001384422636067"));
         Date modificationDate = new Date(Long.parseLong("001384422636067"));
-        
 		return new User(username, name, email, creationDate, modificationDate);
 	}
 
